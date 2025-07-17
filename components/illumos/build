@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+# {{{ CDDL HEADER
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source. A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+# }}}
+#
+# Copyright 2025 Jalil HESSANE
+#
+
+#
+# This script builds illumos, make SVR4 packages out of it and install them in
+# the proto directory.
+#
+
+set -e
+
+. ${XOR_COMPONENTS_DIR}/illumos/conf
+echo "test"
+# Clone illumos if needed
+if [ ! -d "$SRC_DIR/.git" ] && [ -z "$(ls -A "$SRC_DIR" 2>/dev/null)" ]; then
+    echo "Cloning illumos into $SRC_DIR..."
+    git clone "$ILLUMOS_REPO" "$SRC_DIR"
+else
+    echo "Source directory already populated: $SRC_DIR"
+fi
+
+echo "test"
+
+cp ${XOR_COMPONENTS_DIR}/illumos/illumos.sh "${SRC_DIR}/illumos.sh"
+
+: '
+# Build illumos
+cd "$SRC_DIR"
+
+if [ "$INCREMENTAL" = true ]; then
+    echo "Starting illumos incremental build..."
+    time ./usr/src/tools/scripts/nightly -i illumos.sh
+else
+    echo "Starting illumos full build..."
+    time ./usr/src/tools/scripts/nightly illumos.sh
+fi
+'
+
+
+# Make packages
+${XOR_COMPONENTS_DIR}/illumos/scripts/repo_all -S $CERT
+
+# Install packages into the proto directory
+#
+# SUNWcs doesn't completly install, so it generate an error, but it's still
+# working so that's a future me problem
+set +e
+# it's quite hacky to pipe yes into pkgadd, but it works 
+for pkg in "${XOR_PACKAGES_DIR}"/pkgs/*.pkg; do
+    echo "Installing $(basename "$pkg")"
+    yes | pkgadd -R "$XOR_PROTO_DIR" -d "$pkg" all
+done
+

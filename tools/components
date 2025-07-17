@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# {{{ CDDL HEADER
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source. A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+# }}}
+#
+# Copyright 2025 Jalil HESSANE
+#
+
+#
+# This script builds every component in the component directory. 
+# Shoud add a way to build only one or a selection of components
+#
+
+set -e
+
+if [ ! -d "$XOR_PROTO_DIR" ]; then
+  mkdir -p "$XOR_PROTO_DIR"
+fi
+
+if [ ! -d "$XOR_PACKAGES_DIR" ]; then
+  mkdir "$XOR_PACKAGES_DIR"
+fi
+
+
+for dir in "$XOR_COMPONENTS_DIR"/*/; do
+  if [ -d "$dir" ]; then
+    script="$dir/build"
+    if [ -x "$script" ]; then
+      echo "exec $script"
+      (cd "$dir" && ./build)
+    else
+      echo "no build script in $dir"
+    fi
+  fi
+done

@@ -1,0 +1,83 @@
+#!/bin/bash
+#
+# {{{ CDDL HEADER
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source. A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+# }}}
+#
+# Copyright 2025 Jalil HESSANE
+#
+
+#
+# This script makes boot_archive and boot_archive.hash
+#
+
+set -e
+
+if [ ! -d "$XOR_PROTO_DIR" ]; then
+	echo "Error: Proto directory not found: $PROTO_DIR"
+	exit 1
+fi
+
+if [ -z "$(ls -A "$XOR_PROTO_DIR")" ]; then
+        echo "Error: Proto directory empty: $PROTO_DIR"
+        exit 1
+fi
+
+mkdir -p "${BOOT_ARCHIVE_DIR}"
+
+cd "$XOR_PROTO_DIR"
+tar cf - . | ( cd "$BOOT_ARCHIVE_DIR" && tar xf - )
+
+
+# Init setup (for now not using smf because lack of libxml2)
+cat > "${BOOT_ARCHIVE_DIR}/etc/xor-boot.rc" <<EOF
+#!/sbin/sh
+echo " *** XOR-OS ***" > /dev/console
+/bin/ksh93 >/dev/console 2>&1 </dev/console
+EOF
+
+chmod a+x "${BOOT_ARCHIVE_DIR}/etc/xor-boot.rc"
+
+mv "${BOOT_ARCHIVE_DIR}/etc/inittab" "${BOOT_ARCHIVE_DIR}/etc/inittab.bak"
+# no startd until libxml2
+grep -v startd "${BOOT_ARCHIVE_DIR}/etc/inittab.bak" > "${BOOT_ARCHIVE_DIR}/etc/inittab"
+echo "smf::sysinit:/etc/xor-boot.rc" >> "${BOOT_ARCHIVE_DIR}/etc/inittab"
+
+mkfile $BOOT_ARCHIVE_SIZE "$BOOT_ARCHIVE_FILE"
+chmod 644 "$BOOT_ARCHIVE_FILE"
+LOFI=$(lofiadm -a "$BOOT_ARCHIVE_FILE")
+LOFINUM=$(basename $LOFI)
+echo "y" | newfs -o space -m 0 -i $NBPI /dev/rlofi/${LOFINUM}
+
+MNT="${WORK_DIR}/boot_archive_mount"
+mkdir -p "$MNT"
+mount -Fufs -o nologging $LOFI $MNT
+
+cd "$BOOT_ARCHIVE_DIR"
+tar cf - . | ( cd "$MNT" ; tar xf - )
+"${BOOT_ARCHIVE_DIR}/usr/sbin/devfsadm" -r "$MNT"
+    
+rm -f "${MNT}/dev/dsk/"* "${MNT}/dev/rdsk/"*
+rm -f "${MNT}/dev/removable-media/dsk/"* "${MNT}/dev/removable-media/rdsk/"*
+
+umount "$MNT"
+lofiadm -d $LOFI
+
+# hash
+openssl dgst -sha1 -binary "$BOOT_ARCHIVE_FILE" | xxd -p > "$BOOT_ARCHIVE_HASH"
+
+gzip --fast "$BOOT_ARCHIVE_FILE"
+mv "${BOOT_ARCHIVE_FILE}.gz" "$BOOT_ARCHIVE_FILE"
+
+
+
+
+echo "Boot archive ready"

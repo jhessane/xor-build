@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+# {{{ CDDL HEADER
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source. A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+# }}}
+#
+# Copyright 2025 Jalil HESSANE
+#
+
+#
+# This script makes the boot environnement / rootfs, don't know how to call it
+#
+
+set -e
+
+mkdir -p "${BOOT_ENV_DIR}" 
+
+if [ ! -f "$BOOT_ARCHIVE_FILE" ]; then
+	echo "Error: Boot archive not found"
+	exit 1
+fi
+
+if [ ! -f "$BOOT_ARCHIVE_HASH" ]; then
+	echo "Error: Boot archive hash not found"
+	exit 1
+fi
+
+
+mkdir "${BOOT_ENV_DIR}/boot"
+cd  "${XOR_PROTO_DIR}/boot"
+tar cf - . |  ( cd "${BOOT_ENV_DIR}/boot" && tar xf - )
+
+mkdir "${BOOT_ENV_DIR}/platform"
+cd  "${XOR_PROTO_DIR}/platform"
+tar cf - . |  ( cd "${BOOT_ENV_DIR}/platform" && tar xf - )
+
+cp "$BOOT_ARCHIVE_FILE" "${BOOT_ENV_DIR}/platform/i86pc/amd64/boot_archive"
+
+cp "$BOOT_ARCHIVE_HASH" "${BOOT_ENV_DIR}/platform/i86pc/amd64/boot_archive.hash"
+
+echo "BE ready"

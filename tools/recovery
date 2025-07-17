@@ -1,0 +1,51 @@
+#!/bin/bash
+#
+# {{{ CDDL HEADER
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source. A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+# }}}
+#
+# Copyright 2025 Jalil HESSANE
+#
+
+#
+# This script makes the recovery/install ISO image
+#
+
+set -e
+
+if [ ! -d "$XOR_OUTPUT_DIR" ]; then
+  mkdir "$XOR_OUTPUT_DIR"
+fi
+
+if [ ! -d "${BOOT_ENV_DIR}/boot" ] || [ ! -d "${BOOT_ENV_DIR}/platform" ]; then
+        echo "Error: Rootfs not found. Run: $0 rootfs"
+        exit 1
+fi      
+
+xorriso -as mkisofs \
+        -o "$XOR_ISO_NAME" \
+        -b boot/cdboot \
+        -no-emul-boot \
+        -boot-load-size 4 \
+        -boot-info-table \
+        -R -J \
+        -V "xor-recovery-${XOR_RELEASE}" \
+        -A "XOR recovery ISO" \
+        -publisher "xor" \
+        -preparer "xor build script" \
+        "$BOOT_ENV_DIR" >/dev/null 2>&1
+
+    if [ -f "$XOR_ISO_NAME" ]; then
+        echo "Recovery image created: $XOR_ISO_NAME ($(ls -lh "$XOR_ISO_NAME" | awk '{print $5}'))"
+    else
+        echo "Error: Recovery image creation failed"
+        exit 1
+    fi
