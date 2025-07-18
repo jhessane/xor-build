@@ -16,21 +16,14 @@
 #
 
 #
-# This script builds every component in the component directory. 
-# Shoud add a way to build only one or a selection of components
+# This script builds components, you can specify which ones with gmake by
+# running this:
+# gmake components LIST="tintin haddock tournesol"
+# For example, here it will build tintin, haddock and tournesol.
 #
 
 set -e
-
-if [ ! -d "$XOR_PROTO_DIR" ]; then
-  mkdir -p "$XOR_PROTO_DIR"
-fi
-
-if [ ! -d "$XOR_PACKAGES_DIR" ]; then
-  mkdir "$XOR_PACKAGES_DIR"
-fi
-
-
+: '
 for dir in "$XOR_COMPONENTS_DIR"/*/; do
   if [ -d "$dir" ]; then
     script="$dir/build"
@@ -42,3 +35,26 @@ for dir in "$XOR_COMPONENTS_DIR"/*/; do
     fi
   fi
 done
+'
+if [ "$#" -eq 0 ]; then
+    for dir in "$XOR_COMPONENTS_DIR"/*/; do
+        if [ -x "$dir/build" ]; then
+            (cd "$dir" && ./build)
+        else
+            echo "no build script in $dir"
+        fi
+    done
+else
+    for name in "$@"; do
+        dir="$XOR_COMPONENTS_DIR/$name"
+        if [ -d "$dir" ]; then
+            if [ -x "$dir/build" ]; then
+                (cd "$dir" && ./build)
+            else
+                echo "no build script in $dir"
+            fi
+        else
+            echo "$dir not found"
+        fi
+    done
+fi

@@ -33,7 +33,6 @@ if [ ! -f "$BOOT_ARCHIVE_HASH" ]; then
 	exit 1
 fi
 
-
 mkdir "${BOOT_ENV_DIR}/boot"
 cd  "${XOR_PROTO_DIR}/boot"
 tar cf - . |  ( cd "${BOOT_ENV_DIR}/boot" && tar xf - )

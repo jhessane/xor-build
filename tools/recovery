@@ -26,7 +26,7 @@ if [ ! -d "$XOR_OUTPUT_DIR" ]; then
 fi
 
 if [ ! -d "${BOOT_ENV_DIR}/boot" ] || [ ! -d "${BOOT_ENV_DIR}/platform" ]; then
-        echo "Error: Rootfs not found. Run: $0 rootfs"
+        echo "Error boot_env not found."
         exit 1
 fi      
 

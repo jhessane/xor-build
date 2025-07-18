@@ -29,7 +29,7 @@
 PKG_VERSION="0R0"
 THOME="$XOR_DIR"
 GATEDIR="${XOR_COMPONENTS_DIR}/illumos/illumos-xor"
-DSTDIR="$XOR_PACKAGES_DIR"
+DSTDIR="$XOR_ILLUMOS_PACKAGES_DIR"
 SIGNCERT=""
 MYREPO="redist"
 QUICKMODE=""
@@ -144,7 +144,7 @@ PKGDIR=/usr/bin
 PKGMK="${PKGDIR}/pkgmk"
 PKGTRANS="${PKGDIR}/pkgtrans"
 PNAME=${XOR_COMPONENTS_DIR}/illumos/scripts/pkg_name
-TRANSDIR=var/tmp/transforms
+TRANSDIR=/var/tmp/transforms
 
 #
 # used for noisaexec

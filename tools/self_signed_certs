@@ -16,7 +16,7 @@
 #
 
 #
-# This script makes self signed certificates used to sign packages
+# This script makes self signed certificates used to sign SVR4 packages
 #
 
 set -e

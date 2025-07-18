@@ -2,4 +2,3 @@ output/
 cert.crt
 cert.key
 components/illumos/illumos-xor/
-components/illumos/transform/

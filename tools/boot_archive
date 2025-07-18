@@ -36,7 +36,6 @@ mkdir -p "${BOOT_ARCHIVE_DIR}"
 cd "$XOR_PROTO_DIR"
 tar cf - . | ( cd "$BOOT_ARCHIVE_DIR" && tar xf - )
 
-
 # Init setup (for now not using smf because lack of libxml2)
 cat > "${BOOT_ARCHIVE_DIR}/etc/xor-boot.rc" <<EOF
 #!/sbin/sh
@@ -77,7 +76,5 @@ openssl dgst -sha1 -binary "$BOOT_ARCHIVE_FILE" | xxd -p > "$BOOT_ARCHIVE_HASH"
 gzip --fast "$BOOT_ARCHIVE_FILE"
 mv "${BOOT_ARCHIVE_FILE}.gz" "$BOOT_ARCHIVE_FILE"
 
-
-
-
+# THE END
 echo "Boot archive ready"

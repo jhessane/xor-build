@@ -28,7 +28,7 @@ self_signed_certs:
 
 components: self_signed_certs
 	@echo "Components"
-	@$(XOR_DIR)/tools/components
+	@$(XOR_DIR)/tools/components $(LIST)
 
 boot_archive: 
 	@echo "Boot Archive"
@@ -41,7 +41,6 @@ boot_env: boot_archive
 recovery: boot_env
 	@echo "Recovery ISO"
 	@$(XOR_DIR)/tools/recovery
-	@echo "ISO created: $(ISO_NAME)"
 
 clean:
 	@echo "=== Cleaning up ==="

@@ -29,7 +29,7 @@
 PKG_VERSION="$XOR_RELEASE"
 THOME="$XOR_DIR"
 GATEDIR="${XOR_COMPONENTS_DIR}/illumos/illumos-xor"
-DSTDIR="$XOR_PACKAGES_DIR"
+DSTDIR="$XOR_ILLUMOS_PACKAGES_DIR"
 MYREPO="redist"
 QFLAG=""
 
@@ -109,7 +109,6 @@ fi
 
 CMD="${XOR_COMPONENTS_DIR}/illumos/scripts/repo2svr4"
 PNAME="${XOR_COMPONENTS_DIR}/illumos/scripts/pkg_name"
-#PKG2ZAP=${THOME}/tribblix-build/pkg2zap
 
 mkdir -p "${DSTDIR}"
 cd "$REPODIR/pkg" || bail "cannot cd"

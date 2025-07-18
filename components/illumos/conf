@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # {{{ CDDL HEADER
 #
@@ -18,6 +19,8 @@
 # Illumos configuration. See also illumos.sh
 #
 
-ILLUMOS_REPO="https://github.com/jhessane/illumos-xor.git"
-SRC_DIR="${XOR_DIR}/components/illumos/illumos-xor"
-INCREMENTAL=false
+export ILLUMOS_REPO="https://github.com/jhessane/illumos-xor.git"
+export XOR_ILLUMOS_DIR="${XOR_COMPONENTS_DIR}/illumos"
+export SRC_DIR="${XOR_ILLUMOS_DIR}/illumos-xor"
+export XOR_ILLUMOS_PACKAGES_DIR="${XOR_PACKAGES_DIR}/illumos"
+export INCREMENTAL=false
